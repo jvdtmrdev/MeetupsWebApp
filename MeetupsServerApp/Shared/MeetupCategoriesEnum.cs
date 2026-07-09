@@ -1,4 +1,4 @@
-﻿namespace MeetupsServerApp.Features.ViewCreatedEvents
+﻿namespace MeetupsServerApp.Shared
 {
     public enum MeetupCategoriesEnum
     {

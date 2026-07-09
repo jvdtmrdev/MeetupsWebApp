@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MeetupsServerApp.Features.ViewCreatedEvents
+namespace MeetupsServerApp.Shared.ViewModels
 {
     public class EventViewModel
     {
