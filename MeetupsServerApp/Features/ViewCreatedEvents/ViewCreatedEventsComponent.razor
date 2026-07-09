@@ -1,0 +1,82 @@
+﻿@page "/"
+
+@inject ViewCreatedEventsService ViewCreatedEventsService
+
+<PageTitle>
+    رویدادهای ایجادشده
+</PageTitle>
+
+<h3></h3>
+
+<MudTable Items="@models"
+          Hover="true"
+          Breakpoint="Breakpoint.Sm"
+          Loading="@_loading"
+          LoadingProgressColor="Color.Info">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">
+            رویدادهای ایجادشده
+        </MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1"
+                      Placeholder="جستجو"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh Style="text-align:center;">عنوان رویداد</MudTh>
+        <MudTh Style="text-align:center;">تاریخ و زمان شروع</MudTh>
+        <MudTh Style="text-align:center;">تاریخ و زمان خاتمه</MudTh>
+        <MudTh Style="text-align:center;">دسته‌بندی</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd Style="text-align:center;">@context.Title</MudTd>
+        <MudTd Style="text-align:center;" Class="mud-ltr">@context.BeginDateTime</MudTd>
+        <MudTd Style="text-align:center;" Class="mud-ltr">@context.EndDateTime</MudTd>
+        <MudTd Style="text-align:center;">@context.Categorytitle</MudTd>
+    </RowTemplate>
+    <FooterContent>
+        <MudButton Variant="Variant.Filled"
+                   Href="/events/create"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Color="Color.Success">
+            <MudText Typo="Typo.button">
+                ایجاد یک رویداد جدید
+            </MudText>
+        </MudButton>
+    </FooterContent>
+</MudTable>
+
+
+@code {
+    private List<EventViewModel> models = new List<EventViewModel>();
+    private bool _loading = true;
+    private string searchString1 = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                models = await ViewCreatedEventsService.GetEventsAsync();
+                //await Task.Delay(2000);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                _loading = false;
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(1);
+            }
+
+            
+        }
+    }
+}

@@ -1,0 +1,196 @@
+﻿@page "/events/create"
+@using MeetupsServerApp.Features.ViewCreatedEvents
+@using System.Globalization
+@using System.Reflection
+
+@inject CreateEventService CreateEventService
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    ایجاد رویداد
+</PageTitle>
+
+<EditForm Model="@model" OnValidSubmit="CreateEvent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <MudGrid>
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h5">
+                        ایجاد رویداد
+                    </MudText>
+                </MudCardHeader>
+                <MudCardContent>
+
+                    <MudGrid Spacing="5">
+                        <MudItem xs="6">
+                            <MudTextField Label="عنوان رویداد"
+                                          Variant="Variant.Outlined"
+                                          HelperText="حداکثر ۱۰۰ کاراکتر"
+                                          @bind-Value="model.Title"
+                                          For="@(() => model.Title)" />
+
+                        </MudItem>
+                        <MudFlexBreak />
+                        <MudItem xs="6">
+                            <MudTextField Label="شرح رویداد"
+                                          Variant="Variant.Outlined"
+                                          Lines="10"
+                                          @bind-Value="model.Desription"
+                                          For="@(() => model.Desription)" />
+                        </MudItem>
+                        <MudFlexBreak />
+                        <MudItem xs="1">
+                            <MudDatePicker Label="تاریخ شروع رویداد"
+                                           Variant="Variant.Outlined"
+                                           @bind-Date="model.BeginDate"
+                                           DateFormat="yyyy/MM/dd"
+                                           For="@(() => model.BeginDate)"
+                                           Required="true"
+                                           RequiredError="واردنمودن تاریخ شروع رویداد الزامی است"
+                                           Culture="@GetPersianCulture()"
+                                           TitleDateFormat="dddd, dd MMMM" />
+                        </MudItem>
+                        <MudItem xs="1">
+                            <MudTimePicker Label="ساعت شروع رویداد"
+                                           Variant="Variant.Outlined"
+                                           @bind-Time="model.BeginTime"
+                                           Required="true"
+                                           RequiredError="واردنمودن ساعت شروع رویداد الزامی است"
+                                           For="@(() => model.BeginTime)" />
+                        </MudItem>
+                        <MudItem xs="1">
+                            <MudDatePicker Label="تاریخ خاتمه رویداد"
+                                           Variant="Variant.Outlined"
+                                           @bind-Date="model.EndDate"
+                                           DateFormat="yyyy/MM/dd"
+                                           For="@(() => model.EndDate)"
+                                           Required="true"
+                                           RequiredError="واردنمودن تاریخ خاتمه رویداد الزامی است"
+                                           Culture="@GetPersianCulture()"
+                                           TitleDateFormat="dddd, dd MMMM" />
+                        </MudItem>
+                        <MudItem xs="1">
+                            <MudTimePicker Label="ساعت خاتمه رویداد"
+                                           Variant="Variant.Outlined"
+                                           @bind-Time="model.EndTime"
+                                           Required="true"
+                                           RequiredError="واردنمودن ساعت خاتمه رویداد الزامی است"
+                                           For="@(() => model.EndTime)" />
+                        </MudItem>
+                        <MudFlexBreak />
+                        @if (model.Category == MeetupCategoriesEnum.InPerson.ToString())
+                        {
+                            <MudItem xs="6">
+                                <MudTextField Label="مکان برگزاری"
+                                              Variant="Variant.Outlined"
+                                              @bind-Value="model.Location" />
+                            </MudItem>
+                        }
+                        else if (model.Category == MeetupCategoriesEnum.Online.ToString())
+                        {
+                            <MudItem xs="6">
+                                <MudTextField Label="لینک آدرس"
+                                              Variant="Variant.Outlined"
+                                              @bind-Value="model.MeetupLink" />
+                            </MudItem>
+                        }
+                        <MudFlexBreak />
+                    </MudGrid>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <MudAlert Severity="Severity.Error"
+                                  Dense="true"
+                                  Class="my-2">
+                            <MudText Typo="Typo.body1">
+                                @errorMessage
+                            </MudText>
+                        </MudAlert>
+                    }
+
+                </MudCardContent>
+                <MudCardActions>
+
+                    <MudStack Row="true" Spacing="2">
+                        <MudButton ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   Size="Size.Large"
+                                   StartIcon="@Icons.Material.TwoTone.SaveAlt">
+                            <MudText Typo="Typo.button">
+                                ذخیره تغییرات
+                            </MudText>
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Default"
+                                   Size="Size.Large"
+                                   StartIcon="@Icons.Material.TwoTone.Cancel">
+                            <MudText Typo="Typo.button">
+                                انصراف
+                            </MudText>
+                        </MudButton>
+                    </MudStack>
+
+
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+    </MudGrid>
+</EditForm>
+
+@code {
+    EventViewModel model = new EventViewModel();
+
+    private string? errorMessage = string.Empty;
+
+    private async Task CreateEvent()
+    {
+        errorMessage = model.Validate();
+
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            return;
+        }
+
+        await CreateEventService.CreateEventAsync(model);
+
+        NavigationManager.NavigateTo("/");
+    }
+
+    public CultureInfo GetPersianCulture()
+    {
+        var culture = new CultureInfo("fa-IR");
+        DateTimeFormatInfo formatInfo = culture.DateTimeFormat;
+        formatInfo.AbbreviatedDayNames = new[] { "ی", "د", "س", "چ", "پ", "ج", "ش" };
+        formatInfo.DayNames = new[] { "یکشنبه", "دوشنبه", "سه شنبه", "چهار شنبه", "پنجشنبه", "جمعه", "شنبه" };
+        var monthNames = new[]
+        {
+            "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن",
+            "اسفند",
+            "",
+        };
+        formatInfo.AbbreviatedMonthNames =
+            formatInfo.MonthNames =
+                formatInfo.MonthGenitiveNames = formatInfo.AbbreviatedMonthGenitiveNames = monthNames;
+        formatInfo.AMDesignator = "ق.ظ";
+        formatInfo.PMDesignator = "ب.ظ";
+        formatInfo.ShortDatePattern = "yyyy/MM/dd";
+        formatInfo.LongDatePattern = "dddd, dd MMMM,yyyy";
+        formatInfo.FirstDayOfWeek = DayOfWeek.Saturday;
+        Calendar cal = new PersianCalendar();
+        FieldInfo fieldInfo = culture.GetType().GetField("calendar", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (fieldInfo != null)
+            fieldInfo.SetValue(culture, cal);
+        FieldInfo info = formatInfo.GetType().GetField("calendar", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (info != null)
+            info.SetValue(formatInfo, cal);
+        culture.NumberFormat.NumberDecimalSeparator = "/";
+        culture.NumberFormat.DigitSubstitution = DigitShapes.NativeNational;
+        culture.NumberFormat.NumberNegativePattern = 0;
+        return culture;
+    }
+}

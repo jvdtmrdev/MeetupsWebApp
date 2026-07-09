@@ -1,0 +1,37 @@
+﻿@charset 'utf-8';
+
+@font-face {
+    font-family: 'SDF';
+    src: url('/fonts/IRANSans-Light-web.woff') format('woff'),url('/fonts/IRANSans-Light-web.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'SDF';
+    src: url('/fonts/IRANSans-Bold-web.woff') format('woff'),url('/fonts/IRANSans-Bold-web.ttf') format('truetype');
+    font-weight: bold;
+}
+
+* {
+    font-family: "SDF",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+html, body {
+    font-family: "SDF",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+    direction: rtl;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+.IRANSans-font {
+    font-family: "SDF",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
