@@ -97,6 +97,28 @@
                             </MudItem>
                         }
                         <MudFlexBreak />
+                        <MudItem xs="3">
+                            <MudFileUpload T="IBrowserFile"
+                                           FilesChanged="UploadFiles"
+                                           MaximumFileCount="1"
+                                           Accept=".png,.jpg,.jpeg">
+                                <CustomContent Context="uploadContext">
+                                    <MudFab Color="Color.Default"
+                                            StartIcon="@Icons.Material.Filled.Image"
+                                            OnClick="@uploadContext.OpenFilePickerAsync"
+                                            Label="انتخاب تصویر کاور - تصویری با نسبت ۱۶:۹" />
+                                </CustomContent>
+                            </MudFileUpload>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudImage Src="@model.ImageUrl"
+                                      Width="300"
+                                      Height="169"
+                                      Alt="پیش نمایش"
+                                      Elevation="2"
+                                      ObjectFit="ObjectFit.Cover"
+                                      Class="rounded-lg ma-4" />
+                        </MudItem>
                     </MudGrid>
 
                     @if (!string.IsNullOrEmpty(errorMessage))
@@ -161,6 +183,110 @@
         NavigationManager.NavigateTo("/");
     }
 
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        if (model is null || file is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (file.Size > 500 * 1024)
+            {
+                errorMessage = "حجم تصویر باید کمتر از ۵۰۰ کیلوبایت باشد.";
+                return;
+            }
+            //تولید نام یکتا
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name).ToLower();
+
+            //پردازش و ذخیره تصویر
+            model.ImageUrl = await SaveResizedImageAsync(file, fileName);
+
+            errorMessage = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"خطا در آپلود تصویر : {ex.Message}";
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    /// <summary>
+    /// تصویر را کراپ و ریسایز کرده و ذخیره می‌کند
+    /// </summary>
+    private async Task<string> SaveResizedImageAsync(IBrowserFile file, string fileName)
+    {
+        var filePath = Path.Combine("wwwroot", "images", "events", fileName);
+
+        // اطمینان از وجود پوشه
+        var directory = Path.GetDirectoryName(filePath);
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory!);
+
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        using var ms = new MemoryStream();
+
+        await stream.CopyToAsync(ms);   // ← این خط مهم است
+        ms.Position = 0;
+
+        using var originalImage = System.Drawing.Image.FromStream(ms);
+
+        int targetWidth = 300;
+        int targetHeight = 169;
+
+        float originalRatio = (float)originalImage.Width / originalImage.Height;
+        float targetRatio = (float)targetWidth / targetHeight;
+
+        int cropWidth = originalImage.Width;
+        int cropHeight = originalImage.Height;
+        int cropX = 0;
+        int cropY = 0;
+
+        if (originalRatio > targetRatio)
+        {
+            cropWidth = (int)(originalImage.Height * targetRatio);
+            cropX = (originalImage.Width - cropWidth) / 2;
+        }
+        else
+        {
+            cropHeight = (int)(originalImage.Width / targetRatio);
+            cropY = (originalImage.Height - cropHeight) / 2;
+        }
+
+        // کراپ
+        using var croppedBitmap = new System.Drawing.Bitmap(cropWidth, cropHeight);
+        using (var g = System.Drawing.Graphics.FromImage(croppedBitmap))
+        {
+            g.DrawImage(originalImage,
+                        new System.Drawing.Rectangle(0, 0, cropWidth, cropHeight),
+                        new System.Drawing.Rectangle(cropX, cropY, cropWidth, cropHeight),
+                        System.Drawing.GraphicsUnit.Pixel);
+        }
+
+        // ریسایز نهایی
+        using var resizedImage = new System.Drawing.Bitmap(targetWidth, targetHeight);
+        using (var graphics = System.Drawing.Graphics.FromImage(resizedImage))
+        {
+            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+            graphics.DrawImage(croppedBitmap, 0, 0, targetWidth, targetHeight);
+        }
+
+        // ذخیره
+        resizedImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+
+        return $"/images/events/{fileName}";
+    }
+
+
+
+
     public CultureInfo GetPersianCulture()
     {
         var culture = new CultureInfo("fa-IR");
@@ -193,4 +319,5 @@
         culture.NumberFormat.NumberNegativePattern = 0;
         return culture;
     }
+
 }

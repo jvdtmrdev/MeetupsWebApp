@@ -31,6 +31,8 @@ namespace MeetupsServerApp.Data.Entities
         [Required]
         public string? Category { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         [Range(0, int.MaxValue)]
         public int Capacity { get; set; }
 

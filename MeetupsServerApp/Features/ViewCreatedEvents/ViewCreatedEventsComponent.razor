@@ -26,12 +26,22 @@
                       Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
+        <MudTh Style="text-align:center;">تصویر</MudTh>
         <MudTh Style="text-align:center;">عنوان رویداد</MudTh>
         <MudTh Style="text-align:center;">تاریخ و زمان شروع</MudTh>
         <MudTh Style="text-align:center;">تاریخ و زمان خاتمه</MudTh>
         <MudTh Style="text-align:center;">دسته‌بندی</MudTh>
     </HeaderContent>
     <RowTemplate>
+        <MudTd Style="text-align:center;">
+            <MudImage Src="@(string.IsNullOrEmpty(context.ImageUrl) ? "/images/image-placeholder.png" : context.ImageUrl)"
+                      Width="100"
+                      Height="56"
+                      Alt="پیش نمایش"
+                      Elevation="2"
+                      ObjectFit="ObjectFit.Cover"
+                      Class="rounded-lg ma-4" />
+        </MudTd>
         <MudTd Style="text-align:center;">@context.Title</MudTd>
         <MudTd Style="text-align:center;" Class="mud-ltr">@context.BeginDateTime</MudTd>
         <MudTd Style="text-align:center;" Class="mud-ltr">@context.EndDateTime</MudTd>

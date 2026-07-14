@@ -17,6 +17,7 @@ namespace MeetupsServerApp.Shared
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
                 .ForMember(dest => dest.MeetupLink, opt => opt.MapFrom(src => src.MeetupLink))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
                 .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.Capacity))
                 .ForMember(dest => dest.OrganizerId, opt => opt.MapFrom(src => src.OrganizerId));
 
@@ -31,6 +32,7 @@ namespace MeetupsServerApp.Shared
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
                 .ForMember(dest => dest.MeetupLink, opt => opt.MapFrom(src => src.MeetupLink))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
                 .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.Capacity))
                 .ForMember(dest => dest.OrganizerId, opt => opt.MapFrom(src => src.OrganizerId));
 

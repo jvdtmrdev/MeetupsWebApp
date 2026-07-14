@@ -12,6 +12,8 @@ namespace MeetupsServerApp.Shared.ViewModels
             EndTime = DateTime.Now.TimeOfDay;
 
             Category = MeetupCategoriesEnum.InPerson.ToString();
+
+            ImageUrl = "/images/image-placeholder.png";
         }
 
         [Required]
@@ -88,6 +90,8 @@ namespace MeetupsServerApp.Shared.ViewModels
         public int Capacity { get; set; }
 
         public int OrganizerId { get; set; }
+
+        public string? ImageUrl { get; set; }
 
         public string? Validate()
         {
