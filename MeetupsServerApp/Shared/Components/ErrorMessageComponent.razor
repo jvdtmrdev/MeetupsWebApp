@@ -1,0 +1,15 @@
+﻿@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <MudAlert Severity="Severity.Error"
+              Dense="true"
+              Class="my-2">
+        <MudText Typo="Typo.body1">
+            @ErrorMessage
+        </MudText>
+    </MudAlert>
+}
+
+@code {
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+}

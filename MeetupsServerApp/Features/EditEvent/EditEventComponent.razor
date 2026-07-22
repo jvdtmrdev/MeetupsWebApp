@@ -1,0 +1,57 @@
+﻿@page "/events/edit/{EventId:int}"
+
+@inject EditEventService EditEventService
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    ویرایش رویداد
+</PageTitle>
+
+@if (model is not null)
+{
+    <AddUpdateEventComponent EventViewModel="model"
+                             OnSaved="UpdateEvent"
+                             ErrorMessage="errorMessage">
+        <ErrorMessageFragment>
+            <ErrorMessageComponent ErrorMessage="@errorMessage" />
+        </ErrorMessageFragment>
+    </AddUpdateEventComponent>
+}
+else
+{
+    <ErrorMessageComponent ErrorMessage="خطا در دریافت اطلاعات رویداد" />
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private EventViewModel? model;
+
+    private string? errorMessage = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            model = await EditEventService.GetEventByIdAsync(EventId);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1);
+        }
+    }
+
+    private async Task UpdateEvent()
+    {
+        errorMessage = model?.Validate();
+
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            return;
+        }
+
+        await EditEventService.UpdateEventAsync(model);
+
+        NavigationManager.NavigateTo("/");
+    }
+
+}

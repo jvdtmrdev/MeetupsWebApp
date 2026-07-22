@@ -1,5 +1,6 @@
 using MeetupsServerApp.Data;
 using MeetupsServerApp.Features.CreateEvent;
+using MeetupsServerApp.Features.EditEvent;
 using MeetupsServerApp.Features.ViewCreatedEvents;
 using MeetupsServerApp.Shared;
 using Microsoft.AspNetCore.Localization;
@@ -14,6 +15,7 @@ builder.Services.AddMudServices();
 
 builder.Services.AddTransient<CreateEventService>();
 builder.Services.AddTransient<ViewCreatedEventsService>();
+builder.Services.AddTransient<EditEventService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

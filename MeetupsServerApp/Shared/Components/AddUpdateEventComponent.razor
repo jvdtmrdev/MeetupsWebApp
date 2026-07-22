@@ -1,0 +1,359 @@
+﻿@using System.Globalization
+@using System.Reflection
+@if (EventViewModel is not null)
+{
+    <EditForm Model="@EventViewModel" OnValidSubmit="Save" OnInvalidSubmit="() => { this.ErrorMessage = string.Empty; }">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <MudGrid>
+            <MudItem xs="12">
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h5">
+                            ایجاد رویداد
+                        </MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+
+                        <MudGrid Spacing="5">
+                            <MudItem xs="6">
+                                <MudTextField Label="عنوان رویداد"
+                                              Variant="Variant.Outlined"
+                                              HelperText="حداکثر ۱۰۰ کاراکتر"
+                                              @bind-Value="EventViewModel.Title"
+                                              For="@(() => EventViewModel.Title)" />
+
+                            </MudItem>
+                            <MudFlexBreak />
+                            <MudItem xs="6">
+                                <MudTextField Label="شرح رویداد"
+                                              Variant="Variant.Outlined"
+                                              Lines="10"
+                                              @bind-Value="EventViewModel.Desription"
+                                              For="@(() => EventViewModel.Desription)" />
+                            </MudItem>
+                            <MudFlexBreak />
+                            <MudItem xs="1">
+                                <MudDatePicker Label="تاریخ شروع رویداد"
+                                               Variant="Variant.Outlined"
+                                               @bind-Date="EventViewModel.BeginDate"
+                                               DateFormat="yyyy/MM/dd"
+                                               For="@(() => EventViewModel.BeginDate)"
+                                               Required="true"
+                                               RequiredError="واردنمودن تاریخ شروع رویداد الزامی است"
+                                               Culture="@GetPersianCulture()"
+                                               TitleDateFormat="dddd, dd MMMM" />
+                            </MudItem>
+                            <MudItem xs="1">
+                                <MudTimePicker Label="ساعت شروع رویداد"
+                                               Variant="Variant.Outlined"
+                                               @bind-Time="EventViewModel.BeginTime"
+                                               Required="true"
+                                               RequiredError="واردنمودن ساعت شروع رویداد الزامی است"
+                                               For="@(() => EventViewModel.BeginTime)" />
+                            </MudItem>
+                            <MudItem xs="1">
+                                <MudDatePicker Label="تاریخ خاتمه رویداد"
+                                               Variant="Variant.Outlined"
+                                               @bind-Date="EventViewModel.EndDate"
+                                               DateFormat="yyyy/MM/dd"
+                                               For="@(() => EventViewModel.EndDate)"
+                                               Required="true"
+                                               RequiredError="واردنمودن تاریخ خاتمه رویداد الزامی است"
+                                               Culture="@GetPersianCulture()"
+                                               TitleDateFormat="dddd, dd MMMM" />
+                            </MudItem>
+                            <MudItem xs="1">
+                                <MudTimePicker Label="ساعت خاتمه رویداد"
+                                               Variant="Variant.Outlined"
+                                               @bind-Time="EventViewModel.EndTime"
+                                               Required="true"
+                                               RequiredError="واردنمودن ساعت خاتمه رویداد الزامی است"
+                                               For="@(() => EventViewModel.EndTime)" />
+                            </MudItem>
+                            <MudFlexBreak />
+                            <MudSelect T="string"
+                                       @bind-Value="EventViewModel.Category"
+                                       Label="دسته‌بندی رویداد"
+                                       Variant="Variant.Outlined"
+                                       Placeholder="انتخاب دسته‌بندی ..."
+                                       Required="true"
+                                       RequiredError="واردنمودن دسته‌بندی رویداد الزامی است"
+                                       Class="my-4"
+                                       FitContent="true">
+
+                                <MudSelectItem T="string"
+                                               Value="null">
+                                    لطفاً انتخاب کنید
+                                </MudSelectItem>
+
+                                @foreach (var category in SharedHelper.GetCategories())
+                                {
+                                    <MudSelectItem T="string"
+                                                   Value="@category.Value">
+                                        @category.Text
+                                    </MudSelectItem>
+                                }
+
+                            </MudSelect>
+                            <MudFlexBreak />
+                            @if (EventViewModel.Category == MeetupCategoriesEnum.InPerson.ToString())
+                            {
+                                <MudItem xs="6">
+                                    <MudTextField Label="مکان برگزاری"
+                                                  Variant="Variant.Outlined"
+                                                  @bind-Value="EventViewModel.Location" />
+                                </MudItem>
+                            }
+                            else if (EventViewModel.Category == MeetupCategoriesEnum.Online.ToString())
+                            {
+                                <MudItem xs="6">
+                                    <MudTextField Label="لینک آدرس"
+                                                  Variant="Variant.Outlined"
+                                                  @bind-Value="EventViewModel.MeetupLink" />
+                                </MudItem>
+                            }
+
+                            <MudFlexBreak />
+                            <MudItem xs="2">
+                                <MudNumericField T="int"
+                                                 @bind-Value="EventViewModel.Capacity"
+                                                 Label="ظرفیت رویداد"
+                                                 Variant="Variant.Outlined"
+                                                 Min="0"
+                                                 Required="true"
+                                                 RequiredError="واردنمودن ظرفبت رویداد الزامی است"
+                                                 HelperText="نکته: عدد صفر یعنی ظرفیت نامحدود"
+                                                 Class="my-4" />
+                            </MudItem>
+                            <MudFlexBreak />
+                            <MudItem xs="3">
+                                <MudFileUpload T="IBrowserFile"
+                                               FilesChanged="UploadFiles"
+                                               MaximumFileCount="1"
+                                               Accept=".png,.jpg,.jpeg">
+                                    <CustomContent Context="uploadContext">
+                                        <MudFab Color="Color.Default"
+                                                StartIcon="@Icons.Material.Filled.Image"
+                                                OnClick="@uploadContext.OpenFilePickerAsync"
+                                                Label="انتخاب تصویر کاور - تصویری با نسبت ۱۶:۹" />
+                                    </CustomContent>
+                                </MudFileUpload>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudImage Src="@EventViewModel.ImageUrl"
+                                          Width="300"
+                                          Height="169"
+                                          Alt="پیش نمایش"
+                                          Elevation="2"
+                                          ObjectFit="ObjectFit.Cover"
+                                          Class="rounded-lg ma-4" />
+                            </MudItem>
+                        </MudGrid>
+
+                        @if (ErrorMessageFragment is not null)
+                        {
+                            @ErrorMessageFragment
+                        }
+                        <ValidationSummary />
+
+                    </MudCardContent>
+                    <MudCardActions>
+
+                        <MudStack Row="true" Spacing="2">
+                            <MudButton ButtonType="ButtonType.Submit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       Size="Size.Large"
+                                       StartIcon="@Icons.Material.TwoTone.SaveAlt">
+                                <MudText Typo="Typo.button">
+                                    @if (EventViewModel?.EventId != 0)
+                                    {
+                                        <MudText>
+                                            بروزرسانی
+                                        </MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText>
+                                            ایجاد
+                                        </MudText>
+                                    }
+                                </MudText>
+                            </MudButton>
+
+                            <MudButton Variant="Variant.Filled"
+                                       Href="/"
+                                       Color="Color.Default"
+                                       Size="Size.Large"
+                                       StartIcon="@Icons.Material.TwoTone.Cancel">
+                                <MudText Typo="Typo.button">
+                                    انصراف
+                                </MudText>
+                            </MudButton>
+
+                        </MudStack>
+
+
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+
+        </MudGrid>
+    </EditForm>
+}
+
+
+@code {
+    [Parameter]
+    public EventViewModel? EventViewModel { get; set; }
+
+    [Parameter]
+    public EventCallback<EventViewModel?> OnSaved { get; set; }
+
+    [Parameter]
+    public RenderFragment? ErrorMessageFragment { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    private async Task Save()
+    {
+        await OnSaved.InvokeAsync(this.EventViewModel);
+    }
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        if (EventViewModel is null || file is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (file.Size > 500 * 1024)
+            {
+                ErrorMessage = "حجم تصویر باید کمتر از ۵۰۰ کیلوبایت باشد.";
+                return;
+            }
+            //تولید نام یکتا
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name).ToLower();
+
+            //پردازش و ذخیره تصویر
+            EventViewModel.ImageUrl = await SaveResizedImageAsync(file, fileName);
+
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"خطا در آپلود تصویر : {ex.Message}";
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    /// <summary>
+    /// تصویر را کراپ و ریسایز کرده و ذخیره می‌کند
+    /// </summary>
+    private async Task<string> SaveResizedImageAsync(IBrowserFile file, string fileName)
+    {
+        var filePath = Path.Combine("wwwroot", "images", "events", fileName);
+
+        // اطمینان از وجود پوشه
+        var directory = Path.GetDirectoryName(filePath);
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory!);
+
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        using var ms = new MemoryStream();
+
+        await stream.CopyToAsync(ms);   // ← این خط مهم است
+        ms.Position = 0;
+
+        using var originalImage = System.Drawing.Image.FromStream(ms);
+
+        int targetWidth = 300;
+        int targetHeight = 169;
+
+        float originalRatio = (float)originalImage.Width / originalImage.Height;
+        float targetRatio = (float)targetWidth / targetHeight;
+
+        int cropWidth = originalImage.Width;
+        int cropHeight = originalImage.Height;
+        int cropX = 0;
+        int cropY = 0;
+
+        if (originalRatio > targetRatio)
+        {
+            cropWidth = (int)(originalImage.Height * targetRatio);
+            cropX = (originalImage.Width - cropWidth) / 2;
+        }
+        else
+        {
+            cropHeight = (int)(originalImage.Width / targetRatio);
+            cropY = (originalImage.Height - cropHeight) / 2;
+        }
+
+        // کراپ
+        using var croppedBitmap = new System.Drawing.Bitmap(cropWidth, cropHeight);
+        using (var g = System.Drawing.Graphics.FromImage(croppedBitmap))
+        {
+            g.DrawImage(originalImage,
+                        new System.Drawing.Rectangle(0, 0, cropWidth, cropHeight),
+                        new System.Drawing.Rectangle(cropX, cropY, cropWidth, cropHeight),
+                        System.Drawing.GraphicsUnit.Pixel);
+        }
+
+        // ریسایز نهایی
+        using var resizedImage = new System.Drawing.Bitmap(targetWidth, targetHeight);
+        using (var graphics = System.Drawing.Graphics.FromImage(resizedImage))
+        {
+            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+            graphics.DrawImage(croppedBitmap, 0, 0, targetWidth, targetHeight);
+        }
+
+        // ذخیره
+        resizedImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+
+        return $"/images/events/{fileName}";
+    }
+
+
+    public CultureInfo GetPersianCulture()
+    {
+        var culture = new CultureInfo("fa-IR");
+        DateTimeFormatInfo formatInfo = culture.DateTimeFormat;
+        formatInfo.AbbreviatedDayNames = new[] { "ی", "د", "س", "چ", "پ", "ج", "ش" };
+        formatInfo.DayNames = new[] { "یکشنبه", "دوشنبه", "سه شنبه", "چهار شنبه", "پنجشنبه", "جمعه", "شنبه" };
+        var monthNames = new[]
+        {
+            "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن",
+            "اسفند",
+            "",
+        };
+        formatInfo.AbbreviatedMonthNames =
+            formatInfo.MonthNames =
+                formatInfo.MonthGenitiveNames = formatInfo.AbbreviatedMonthGenitiveNames = monthNames;
+        formatInfo.AMDesignator = "ق.ظ";
+        formatInfo.PMDesignator = "ب.ظ";
+        formatInfo.ShortDatePattern = "yyyy/MM/dd";
+        formatInfo.LongDatePattern = "dddd, dd MMMM,yyyy";
+        formatInfo.FirstDayOfWeek = DayOfWeek.Saturday;
+        Calendar cal = new PersianCalendar();
+        FieldInfo fieldInfo = culture.GetType().GetField("calendar", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (fieldInfo != null)
+            fieldInfo.SetValue(culture, cal);
+        FieldInfo info = formatInfo.GetType().GetField("calendar", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (info != null)
+            info.SetValue(formatInfo, cal);
+        culture.NumberFormat.NumberDecimalSeparator = "/";
+        culture.NumberFormat.DigitSubstitution = DigitShapes.NativeNational;
+        culture.NumberFormat.NumberNegativePattern = 0;
+        return culture;
+    }
+}

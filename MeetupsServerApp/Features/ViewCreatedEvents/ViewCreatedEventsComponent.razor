@@ -31,21 +31,29 @@
         <MudTh Style="text-align:center;">تاریخ و زمان شروع</MudTh>
         <MudTh Style="text-align:center;">تاریخ و زمان خاتمه</MudTh>
         <MudTh Style="text-align:center;">دسته‌بندی</MudTh>
+        <MudTh Style="text-align:center;">ظرفیت</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd Style="text-align:center;">
-            <MudImage Src="@(string.IsNullOrEmpty(context.ImageUrl) ? "/images/image-placeholder.png" : context.ImageUrl)"
-                      Width="100"
-                      Height="56"
-                      Alt="پیش نمایش"
-                      Elevation="2"
-                      ObjectFit="ObjectFit.Cover"
-                      Class="rounded-lg ma-4" />
+            <MudLink Href="@($"/events/edit/{context.EventId}")">
+                <MudImage Src="@(string.IsNullOrEmpty(context.ImageUrl) ? "/images/image-placeholder.png" : context.ImageUrl)"
+                          Width="100"
+                          Height="56"
+                          Alt="پیش نمایش"
+                          Elevation="2"
+                          ObjectFit="ObjectFit.Cover"
+                          Class="rounded-lg ma-4" />
+            </MudLink>
         </MudTd>
-        <MudTd Style="text-align:center;">@context.Title</MudTd>
+        <MudTd Style="text-align:center;">
+            <MudLink Href="@($"/events/edit/{context.EventId}")">
+                @context.Title
+            </MudLink>
+        </MudTd>
         <MudTd Style="text-align:center;" Class="mud-ltr">@context.BeginDateTime</MudTd>
         <MudTd Style="text-align:center;" Class="mud-ltr">@context.EndDateTime</MudTd>
-        <MudTd Style="text-align:center;">@context.Categorytitle</MudTd>
+        <MudTd Style="text-align:center;">@context.CategoryDisplayName</MudTd>
+        <MudTd Style="text-align:center;">@context.CapacityDisplay</MudTd>
     </RowTemplate>
     <FooterContent>
         <MudButton Variant="Variant.Filled"

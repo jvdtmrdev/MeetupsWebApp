@@ -11,16 +11,14 @@ namespace MeetupsServerApp.Shared.ViewModels
             EndDate = DateTime.Now.Date;
             EndTime = DateTime.Now.TimeOfDay;
 
-            Category = MeetupCategoriesEnum.InPerson.ToString();
-
             ImageUrl = "/images/image-placeholder.png";
         }
 
         [Required]
         public int EventId { get; set; }
 
-        [Required]
-        [StringLength(maximumLength: 100, ErrorMessage = "واردنمودن عنوان رویداد الزامی است.")]
+        [Required(ErrorMessage = "واردنمودن عنوان رویداد الزامی است.")]
+        [StringLength(maximumLength: 100, ErrorMessage = "عنوان رویداد حداکثر ۱۰۰ کارکتر میتواند باشد.")]
         public string? Title { get; set; }
 
         [StringLength(maximumLength: 4000)]
@@ -66,28 +64,32 @@ namespace MeetupsServerApp.Shared.ViewModels
         public string? Location { get; set; }
         public string? MeetupLink { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "دسته‌بندی رویداد الزامی است.")]
         public string? Category { get; set; }
 
-        public string Categorytitle
+        public string CategoryDisplayName => Category?.ToLowerInvariant() switch
         {
-            get
-            {
-                if (string.IsNullOrEmpty(Category))
-                    return string.Empty;
+            "inperson" => "حضوری",
+            "online" => "آنلاین",
+            _ => string.Empty
+        };
 
-                switch (Category)
-                {
-                    case "InPerson": return "حضوری";
-                    case "Online": return "آنلاین";
-                    default:
-                        return string.Empty;
-                }
-            }
-        }
 
         [Range(0, int.MaxValue)]
         public int Capacity { get; set; }
+
+        public string CapacityDisplay
+        {
+            get
+            {
+                if (Capacity == 0)
+                    return "نامحدود";
+
+                var formattedNumber = PersianFormat.NumberGroupping(Capacity.ToString());
+
+                return PersianFormat.En2Fa(formattedNumber);
+            }
+        }
 
         public int OrganizerId { get; set; }
 
