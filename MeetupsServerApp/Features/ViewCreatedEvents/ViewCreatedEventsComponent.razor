@@ -1,6 +1,8 @@
 ﻿@page "/"
 
 @inject ViewCreatedEventsService ViewCreatedEventsService
+@inject NavigationManager NavigationManager
+
 
 <PageTitle>
     رویدادهای ایجادشده
@@ -32,6 +34,7 @@
         <MudTh Style="text-align:center;">تاریخ و زمان خاتمه</MudTh>
         <MudTh Style="text-align:center;">دسته‌بندی</MudTh>
         <MudTh Style="text-align:center;">ظرفیت</MudTh>
+        <MudTh Style="text-align:center;"></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd Style="text-align:center;">
@@ -54,6 +57,14 @@
         <MudTd Style="text-align:center;" Class="mud-ltr">@context.EndDateTime</MudTd>
         <MudTd Style="text-align:center;">@context.CategoryDisplayName</MudTd>
         <MudTd Style="text-align:center;">@context.CapacityDisplay</MudTd>
+        <MudTd Style="text-align:center;">
+            <DeleteEventComponent EventViewModel="context"
+                                  ButtonVariant="Variant.Filled"
+                                  ButtonColor="Color.Error"
+                                  ButtonText="حذف"
+                                  OnDeleted="HandleDeletedEventAsync">
+            </DeleteEventComponent>
+        </MudTd>
     </RowTemplate>
     <FooterContent>
         <MudButton Variant="Variant.Filled"
@@ -94,7 +105,18 @@
                 await Task.Delay(1);
             }
 
-            
+
         }
     }
+
+    private Task HandleDeletedEventAsync(int eventId)
+    {
+        //NavigationManager.NavigateTo("/", forceLoad:true);
+
+        models.RemoveAll(x => x.EventId == eventId);
+
+        return Task.CompletedTask;
+    }
+
+
 }

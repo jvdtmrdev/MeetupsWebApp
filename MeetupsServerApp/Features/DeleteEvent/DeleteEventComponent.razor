@@ -1,0 +1,81 @@
+﻿@inject IDialogService DialogService
+@inject DeleteEventService DeleteEventService
+
+<ErrorMessageComponent ErrorMessage="@errorMessage" />
+
+<MudButton Variant="@ButtonVariant"
+           Color="@ButtonColor"
+           OnClick="HandleDeleteAsync">
+    @ButtonText
+</MudButton>
+
+@code {
+    [Parameter]
+    public Variant ButtonVariant { get; set; }
+
+    [Parameter]
+    public Color ButtonColor { get; set; }
+
+    [Parameter]
+    public string ButtonText { get; set; }
+
+    [Parameter]
+    public EventViewModel? EventViewModel { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDeleted { get; set; }
+
+
+    private string? errorMessage = string.Empty;
+
+    private async Task HandleDeleteAsync()
+    {
+        var parameters = new DialogParameters<ConfirmDialogComponent>
+        {
+            {
+                x => x.Message,
+                $"آیا از حذف رویداد \"{EventViewModel.Title}\" اطمینان دارید؟"
+            }
+
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialogComponent>(
+            title: string.Empty,
+            parameters,
+            options
+        );
+
+        var result = await dialog.Result;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        if (!await DeleteEventService.IsEventDeletableAsync(EventViewModel.EventId))
+        {
+            errorMessage = "امکان حذف رویدادی که زمان آن گذشته است وجود ندارد.";
+            return;
+        }
+
+        var deleted = await DeleteEventService.DeleteEventAsync(EventViewModel.EventId);
+
+        if (!deleted)
+        {
+            errorMessage = "خطا در حذف رویداد.";
+            return;
+        }
+
+        await OnDeleted.InvokeAsync(EventViewModel.EventId);
+
+        
+    }
+}
