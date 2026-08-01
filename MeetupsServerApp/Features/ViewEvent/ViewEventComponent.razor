@@ -1,0 +1,72 @@
+﻿@page "/event/{Id:int}"
+@using MeetupsServerApp.Features.RSVPEvent
+
+@inject ViewEventService ViewEventService
+@inject LayoutService LayoutService
+
+<PageTitle>
+    @(_eventViewModel?.Title ?? "جزئیات رویداد")
+</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6 mb-12">
+    @if (_eventViewModel != null)
+    {
+        @* عنوان اصلی رویداد *@
+        <MudText Typo="Typo.h4" Class="fw-bold mb-4">
+            @_eventViewModel.Title
+        </MudText>
+
+        <MudDivider Class="my-4" />
+
+        @* تصویر کاور رویداد *@
+        @if (!string.IsNullOrEmpty(_eventViewModel.ImageUrl))
+        {
+            <MudImage Src="@_eventViewModel.ImageUrl"
+                      Alt="@_eventViewModel.Title"
+                      Class="rounded-lg w-100 mb-6"
+                      Style="max-height: 400px; object-fit: cover;" />
+        }
+
+        @* بخش جزئیات و شرح رویداد *@
+        <div Class="mt-6">
+            <MudText Typo="Typo.h6" Class="fw-bold mb-3">
+                جزئیات رویداد
+            </MudText>
+
+            <div style="white-space: pre-wrap; word-break: break-word; font-family: inherit; line-height: 1.6;" class="mud-text-primary">
+                @_eventViewModel.Description
+            </div>
+        </div>
+    }
+    else if (IsLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">
+            رویداد مورد نظر یافت نشد.
+        </MudAlert>
+    }
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private EventViewModel? _eventViewModel { get; set; }
+
+    private bool IsLoading => _eventViewModel is null;
+
+    override protected async Task OnParametersSetAsync()
+    {
+        _eventViewModel = await ViewEventService.GetEventByIdAsync(Id);
+
+        @if (_eventViewModel is not null)
+        {
+            LayoutService.SetSectionContent(@<RSVPEventFooterComponent Event="_eventViewModel" />);
+        }
+    }
+
+}

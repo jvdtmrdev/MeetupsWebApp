@@ -1,4 +1,4 @@
-﻿@page "/events/edit/{EventId:int}"
+﻿@page "/org/events/edit/{EventId:int}"
 @using MeetupsServerApp.Features.DeleteEvent
 
 @inject EditEventService EditEventService
@@ -59,12 +59,12 @@ else
 
         await EditEventService.UpdateEventAsync(model);
 
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/org/events");
     }
 
     private Task HandleDeletedEventAsync(int eventId)
     {
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/org/events");
 
         return Task.CompletedTask;
     }

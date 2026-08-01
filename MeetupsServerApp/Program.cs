@@ -1,9 +1,12 @@
 using MeetupsServerApp.Data;
 using MeetupsServerApp.Features.CreateEvent;
 using MeetupsServerApp.Features.DeleteEvent;
+using MeetupsServerApp.Features.DiscoverEvents;
 using MeetupsServerApp.Features.EditEvent;
 using MeetupsServerApp.Features.ViewCreatedEvents;
+using MeetupsServerApp.Features.ViewEvent;
 using MeetupsServerApp.Shared;
+using MeetupsServerApp.Shared.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
@@ -14,10 +17,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
+builder.Services.AddScoped<LayoutService>();
 builder.Services.AddTransient<CreateEventService>();
 builder.Services.AddTransient<ViewCreatedEventsService>();
 builder.Services.AddTransient<EditEventService>();
 builder.Services.AddTransient<DeleteEventService>();
+builder.Services.AddTransient<DiscoverEventsService>();
+builder.Services.AddTransient<ViewEventService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

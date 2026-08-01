@@ -1,0 +1,53 @@
+﻿@inject IDialogService DialogService
+
+@if (Event is not null)
+{
+    <MudContainer MaxWidth="MaxWidth.Large"
+                  Class="d-flex align-center justify-space-between w-100">
+        <div class="d-flex flex-column">
+            <MudText Typo="Typo.subtitle1"
+                     Class="white-text font-weight-bold">
+                @Event.Title
+            </MudText>
+            <MudText Typo="Typo.body2"
+                     Class="grey-text text-lighten-1">
+                @Event.BeginDateTime - @Event.Location
+            </MudText>
+        </div>
+        <MudButton Variant="Variant.Filled"
+                   Size="Size.Large"
+                   Color="Color.Primary"
+                   OnClick="OpenAttendDialog">
+            اعلام حضور (Attend)
+        </MudButton>
+    </MudContainer>
+}
+
+@code {
+    [Parameter]
+    public EventViewModel? Event { get; set; }
+
+    private async Task OpenAttendDialog()
+    {
+        var parameters = new DialogParameters<DialogComponent>
+        {
+            { x => x.Title, "ثبت نام برای شرکت در رویداد" },
+            { x => x.DialogContent, (RenderFragment)(builder =>
+                {
+                    builder.OpenElement(0, "p");
+                    builder.AddContent(1, "جهت ثبت نام و اعلام حضور در این رویداد، لطفاً ابتدا وارد حساب کاربری خود شوید.");
+                    builder.CloseComponent();
+                })
+            }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+
+        await DialogService.ShowAsync<DialogComponent>("ورود/ثبت نام", parameters, options);
+    }
+}

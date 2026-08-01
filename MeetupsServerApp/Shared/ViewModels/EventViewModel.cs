@@ -22,7 +22,7 @@ namespace MeetupsServerApp.Shared.ViewModels
         public string? Title { get; set; }
 
         [StringLength(maximumLength: 4000)]
-        public string? Desription { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         public DateTime? BeginDate { get; set; }

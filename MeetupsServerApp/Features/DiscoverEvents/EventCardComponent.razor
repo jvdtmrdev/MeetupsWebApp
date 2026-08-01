@@ -1,0 +1,58 @@
+﻿<MudItem xs="12" sm="6" md="4">
+    <MudCard Elevation="2" Class="h-100">
+        <MudCardMedia Image="@(string.IsNullOrEmpty(Event.ImageUrl) ? "/images/image-placeholder.png" : Event.ImageUrl)" Height="220" />
+        <MudCardContent Class="pa-4">
+            <MudText Typo="Typo.h6"
+                     Class="fw-bold"
+                     GutterBottom="true"
+                     Color="Color.Primary">
+                @Event.Title
+            </MudText>
+            <MudText Typo="Typo.body2">
+                @Event.Description
+            </MudText>
+            <MudStack Spacing="1">
+
+                <MudText Typo="Typo.body2">
+
+                    <MudIcon Icon="@Icons.Material.TwoTone.EventAvailable"
+                             Color="Color.Success"
+                             Size="Size.Small"
+                             Class="me-1" />
+
+                    <strong>شروع:</strong>
+                    @PersianFormat.En2Fa(Event.BeginDateTime)
+
+                </MudText>
+
+                <MudText Typo="Typo.body2">
+
+                    <MudIcon Icon="@Icons.Material.TwoTone.EventBusy"
+                             Color="Color.Error"
+                             Size="Size.Small"
+                             Class="me-1" />
+
+                    <strong>پایان:</strong>
+                    @PersianFormat.En2Fa(Event.EndDateTime)
+
+                </MudText>
+
+            </MudStack>
+
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Outlined"
+                       Href="@($"/event/{Event.EventId}")"
+                       EndIcon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Primary">
+                اطلاعات بیشتر
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudItem>
+
+@code {
+    [Parameter]
+    public EventViewModel Event { get; set; } = default!;
+}
+

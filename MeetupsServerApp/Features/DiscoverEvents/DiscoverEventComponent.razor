@@ -1,0 +1,114 @@
+﻿@page "/"
+
+@inherits BaseComponent
+
+@inject DiscoverEventsService DiscoverEventsService
+
+<PageTitle>
+    رویدادهای پیش‌ رو
+</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large"
+              Class="mt-6">
+    <MudText Typo="Typo.h4" GutterBottom="true">
+        رویدادهای پیش‌ رو
+    </MudText>
+
+    @if (_events.Count == 0 && !_isLoading)
+    {
+        <MudAlert Severity="Severity.Info"
+                  Variant="Variant.Outlined">
+            رویدادی برای نمایش وجود ندارد.
+        </MudAlert>
+    }
+    else
+    {
+        <MudGrid>
+            @foreach (var eventItem in _events)
+            {
+                <EventCardComponent Event="eventItem"></EventCardComponent>
+            }
+        </MudGrid>
+    }
+
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-center mt-6">
+            <MudProgressCircular Color="Color.Primary"
+                                 Size="Size.Large"
+                                 Indeterminate="true" />
+        </div>
+    }
+
+    @if (_hasMoreEvents && !_isLoading)
+    {
+        <MudStack Row="true"
+                  Justify="Justify.Center"
+                  Class="mt-6">
+
+            <MudButton Variant="Variant.Filled"
+                       EndIcon="@Icons.Material.Filled.ExpandMore"
+                       OnClick="LoadMoreAsync"
+                       Color="Color.Primary">
+                نمایش بیشتر
+            </MudButton>
+
+        </MudStack>
+    }
+
+</MudContainer>
+
+@code {
+    ///discover-events?search=test
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? SearchText { get; set; }
+
+    private bool _isLoading;
+
+    private const int _pageSize = 6;
+    private int _currentPage = 1;
+
+    private bool _hasMoreEvents = true;
+
+    private List<EventViewModel> _events = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadEventsAsync();
+    }
+
+    private async Task LoadEventsAsync()
+    {
+        _isLoading = true;
+
+        _currentPage = 1;
+        _events.Clear();
+
+        var events = await DiscoverEventsService.GetEventsAsync(_currentPage, _pageSize, SearchText);
+
+        _events.AddRange(events);
+
+        _hasMoreEvents = events.Count == _pageSize;
+
+        _isLoading = false;
+    }
+    private async Task LoadMoreAsync(MouseEventArgs args)
+    {
+        if (!_hasMoreEvents)
+        {
+            return;
+        }
+
+        _isLoading = true;
+
+        _currentPage++;
+
+        var events = await DiscoverEventsService.GetEventsAsync(_currentPage, _pageSize, SearchText);
+
+        _events.AddRange(events);
+
+        _hasMoreEvents = events.Count == _pageSize;
+
+        _isLoading = false;
+    }
+}

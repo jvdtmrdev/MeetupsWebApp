@@ -1,12 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
+@inject LayoutService LayoutService
+
+@implements IDisposable
+
 <MudRTLProvider RightToLeft="true">
     <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
     <MudPopoverProvider />
     <MudDialogProvider />
     <MudSnackbarProvider />
     <MudLayout>
-@*         <MudAppBar Elevation="1">
+        @*         <MudAppBar Elevation="1">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
             <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
             <MudSpacer />
@@ -16,9 +20,24 @@
         <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
             <NavMenu />
         </MudDrawer> *@
+        <MudAppBar Elevation="1">
+            <SearchBarComponent NavigationUrl="/"
+                                Placeholder="جستجوی رویدادها ..." />
+        </MudAppBar>
         <MudMainContent Class="pt-16 pa-4">
             @Body
         </MudMainContent>
+
+        @if (LayoutService.SectionContent is not null)
+        {
+            <MudAppBar Bottom="true"
+                       Fixed="true" 
+                       Color="Color.Dark" 
+                       Class="px-4"
+                       Elevation="4">
+                @LayoutService.SectionContent
+            </MudAppBar>
+        }
     </MudLayout>
 </MudRTLProvider>
 
@@ -64,6 +83,18 @@
                 Subtitle2 = new Subtitle2Typography() { FontFamily = fontArray, FontSize = ".875rem", FontWeight = "500", LineHeight = "1.57", LetterSpacing = ".00714em" }
             }
         };
+
+        LayoutService.OnContentChanged += RefreshLayout;
+    }
+
+    private void RefreshLayout()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LayoutService.OnContentChanged -= RefreshLayout;
     }
 
     private void DrawerToggle()
@@ -120,6 +151,7 @@
         true => Icons.Material.Rounded.AutoMode,
         false => Icons.Material.Outlined.DarkMode,
     };
+
 }
 
 

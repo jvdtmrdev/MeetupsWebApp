@@ -1,0 +1,58 @@
+﻿@inject NavigationManager navigationManager
+
+<MudStack Row="true"
+          Spacing="1"
+          AlignItems="AlignItems.Center"
+          Class="w-100">
+
+    <MudTextField T="string"
+                  @bind-Value="_searchText"
+                  Placeholder="@Placeholder"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Adornment="Adornment.Start"
+                  Clearable="true"
+                  OnKeyDown="HandleKeyDown"
+                  Class="flex-grow-1">
+
+    </MudTextField>
+    <MudButton OnClick="NavigateToSearch"
+               StartIcon="@Icons.Material.Filled.Search"
+               Variant="Variant.Filled"
+               Color="Color.Primary">
+        جستجو
+    </MudButton>
+</MudStack>
+
+
+@code {
+    [Parameter]
+    public string NavigationUrl { get; set; } = "/";
+
+    [Parameter]
+    public string Placeholder { get; set; } = "جستجو ...";
+
+    [Parameter]
+    public string QeuryStringName { get; set; } = "search";
+
+    private string _searchText = string.Empty;
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            NavigateToSearch();
+        }
+    }
+
+    private void NavigateToSearch()
+    {
+        _searchText = _searchText.Trim();
+
+        var url = $"{NavigationUrl}?{QeuryStringName}={Uri.EscapeDataString(_searchText)}";
+
+        navigationManager.NavigateTo(url);
+    }
+}
